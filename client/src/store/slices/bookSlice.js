@@ -69,7 +69,7 @@ export default bookSlice.reducer;
 
 export const fetchAllBooks = () => async (dispatch) => {
   dispatch(bookSlice.actions.fetchBooksRequest());
-  await axios.get("http://localhost:4000/api/v1/book/all", { withCredentials: true}).then(res=>{
+  await axios.get("https://book-hive-mt7z.onrender.com/api/v1/book/all", { withCredentials: true}).then(res=>{
     dispatch(bookSlice.actions.fetchBooksSucess(res.data.books))
   }).catch(err=>{
     dispatch(bookSlice.actions.fetchBooksFailed(err.response.data.message));
@@ -79,7 +79,7 @@ export const fetchAllBooks = () => async (dispatch) => {
 // FIX: Removed 'headers: { "Content-Type": "application/json" }' to allow FormData with file upload
 export const addBook = (data)=> async(dispatch)=>{
   dispatch(bookSlice.actions.addBookRequest());
-  await axios.post("http://localhost:4000/api/v1/book/admin/add", data, {
+  await axios.post("https://book-hive-mt7z.onrender.com/api/v1/book/admin/add", data, {
     withCredentials: true,
     // Headers are now correctly omitted for multipart/form-data
   }).then(res=>{
@@ -96,7 +96,7 @@ export const deleteBook = (bookId) => async(dispatch) => { // REMOVED: 'data' pa
   dispatch(bookSlice.actions.addBookRequest()); // Re-using request/loading state for simplicity
   try {
     const res = await axios.delete(
-      `http://localhost:4000/api/v1/book/admin/delete/${bookId}`,
+      `https://book-hive-mt7z.onrender.com/api/v1/book/admin/delete/${bookId}`,
       { withCredentials: true } // CORRECTED: Only URL and config are passed
     );
 
@@ -118,7 +118,7 @@ export const deleteBook = (bookId) => async(dispatch) => { // REMOVED: 'data' pa
 export const getSingleBook = (bookId) => async (dispatch) => {
   dispatch(bookSlice.actions.fetchSingleBookRequest());
   try {
-    const res = await axios.get(`http://localhost:4000/api/v1/book/${bookId}`, { withCredentials: true });
+    const res = await axios.get(`https://book-hive-mt7z.onrender.com/api/v1/book/${bookId}`, { withCredentials: true });
     // Success payload can be returned directly to the component
     dispatch(bookSlice.actions.fetchSingleBookSuccess(res.data.book));
 
