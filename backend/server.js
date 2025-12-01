@@ -1,5 +1,7 @@
-import { app } from "./app.js";
+import { config } from "dotenv"; // Import config here
+config({path: "./config/config.env"}) // Load ENV variables first!
 
+import { app } from "./app.js";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -8,6 +10,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
 })
 
-app.listen(process.env.PORT,  () => {
-  console.log(`Server is running on port ${process.env.PORT}`)
+// Set a fallback port (e.g., 5173 or 8000) for safety
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT,  () => {
+  console.log(`Server is running on port ${PORT}`)
 })

@@ -42,7 +42,6 @@ const userSchema = new mongoose.Schema({
     public_id: String,
     url: String,
    },
-   // Removed verificationCode and verificationCodeExpire
    resetPasswordToken: String,
    resetPasswordExpire: Date,
   },
@@ -51,8 +50,6 @@ const userSchema = new mongoose.Schema({
   }
 );
 
-
-// Removed: userSchema.methods.generateVerificationCode
 
 userSchema.methods.generateToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
