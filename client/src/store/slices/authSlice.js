@@ -125,7 +125,7 @@ export const resetAuthSlice = () => (dispatch) => {
 export const register = (data) => async (dispatch) => {
   dispatch(registerRequest());
   try {
-    const res = await axios.post("https://book-hive-mt7z.onrender.com/api/v1/auth/register", data, {
+    const res = await axios.post("http://localhost:4000/api/v1/auth/register", data, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const register = (data) => async (dispatch) => {
 export const login = (data) => async (dispatch) => {
   dispatch(loginRequest());
   try {
-    const res = await axios.post("https://book-hive-mt7z.onrender.com/api/v1/auth/login", data, {
+    const res = await axios.post("http://localhost:4000/api/v1/auth/login", data, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export const login = (data) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   dispatch(logoutRequest());
   try {
-    const res = await axios.get("https://book-hive-mt7z.onrender.com/api/v1/auth/logout", {
+    const res = await axios.get("http://localhost:4000/api/v1/auth/logout", {
       withCredentials: true,
     });
     dispatch(logoutSuccess(res.data.message));
@@ -168,7 +168,7 @@ export const logout = () => async (dispatch) => {
 export const getUser = () => async (dispatch) => {
   dispatch(getUserRequest());
   try {
-    const res = await axios.get("https://book-hive-mt7z.onrender.com/api/v1/auth/me", {
+    const res = await axios.get("http://localhost:4000/api/v1/auth/me", {
       withCredentials: true,
     });
     dispatch(getUserSuccess(res.data));
@@ -186,7 +186,7 @@ export const simpleResetPassword = (data) => async (dispatch) => {
   dispatch(resetPasswordRequest()); // Reusing resetPassword reducers
   try {
     const res = await axios.put(
-      "https://book-hive-mt7z.onrender.com/api/v1/auth/password/simple-reset", // NEW ENDPOINT
+      "http://localhost:4000/api/v1/auth/password/simple-reset", // NEW ENDPOINT
       data,
       {
         withCredentials: true,
@@ -207,7 +207,7 @@ export const simpleResetPassword = (data) => async (dispatch) => {
 export const updatePassword = (data) => async (dispatch) => {
   dispatch(updatePasswordRequest());
   try {
-    const res = await axios.put(`https://book-hive-mt7z.onrender.com/api/v1/auth/password/update`, data, {
+    const res = await axios.put(`http://localhost:4000/api/v1/auth/password/update`, data, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",

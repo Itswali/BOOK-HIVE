@@ -4,9 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSingleBook } from "../store/slices/bookSlice";
 import { toast } from "react-toastify";
 
-// NOTE: All 'react-pdf' imports have been removed to resolve dependency errors.
-// The PDF viewer now uses a simple <iframe> which relies on the browser's native PDF capabilities.
-
 const OnlineReader = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
@@ -16,30 +13,33 @@ const OnlineReader = () => {
   const { loading, error } = useSelector((state) => state.book);
 
   // --- Redux Fetch Logic ---
+  // (Your useEffect block is correctly using async/await and is fine)
   useEffect(() => {
-    if (bookId) {
-      // Dispatch the thunk to fetch the single book data
-      dispatch(getSingleBook(bookId))
-        .then((action) => {
-            // Check if action.payload exists and contains the book data
-            const book = action.payload;
-
-          if (book && book.bookFile?.url) {
-            setBookData(book);
-          } else {
-            // If the dispatch action fails to return the book payload, handle it.
-            toast.error("Digital book file not available or failed to fetch.");
+    const fetchBook = async () => {
+        if (!bookId) {
             navigate("/");
-          }
-        })
-        .catch((e) => {
+            return;
+        }
+
+        try {
+            const action = await dispatch(getSingleBook(bookId));
+            const book = action?.payload || action;
+
+            if (book && book.bookFile?.url) {
+                setBookData(book);
+            } else {
+                toast.error("Digital book file not available or failed to fetch (Payload structure error).");
+                navigate("/");
+            }
+        } catch (e) {
             console.error("Error fetching single book:", e);
             toast.error("Failed to fetch book data.");
             navigate("/");
-        });
-    } else {
-      navigate("/");
-    }
+        }
+
+    };
+
+    fetchBook();
   }, [dispatch, bookId, navigate]);
 
   // --- Loading/Error UI ---
@@ -66,8 +66,16 @@ const OnlineReader = () => {
     );
   }
 
+  // --- CRITICAL FIX START: Calculate URL here using Optional Chaining ---
+  const originalUrl = bookData?.bookFile?.url;
+
+  // Only calculate viewerUrl if originalUrl exists
+  const viewerUrl = originalUrl
+      ? `https://docs.google.com/viewer?url=${encodeURIComponent(originalUrl)}&embedded=true`
+      : '';
+  // --- CRITICAL FIX END ---
+
   // --- Main Reader Content ---
-  // The iFrame element is used to embed the PDF file, relying on the browser's PDF viewer.
   return (
     <div className="flex flex-col h-screen">
       <header className="bg-indigo-600 text-white p-4 flex justify-between items-center shadow-lg sticky top-0 z-10">
@@ -83,18 +91,19 @@ const OnlineReader = () => {
       </header>
 
       <main className="flex-1 overflow-hidden bg-gray-100 p-0 flex flex-col items-center">
+        {/* The check remains correct */}
         {bookData && bookData.bookFile?.url ? (
           <iframe
-            src={bookData.bookFile.url}
+            // Use the calculated viewerUrl
+            src={viewerUrl}
             title={`PDF Reader for ${bookData.title}`}
             className="w-full h-full border-0"
-            // Ensure the iframe handles PDFs; browsers often default to a viewer
-            type="application/pdf"
           >
             {/* Fallback content for browsers that cannot display PDFs in an iframe */}
             <p className="p-8 text-center text-gray-600">
                 Your browser does not support embedded PDFs.
                 <a
+                    // Use the original URL for download link
                     href={bookData.bookFile.url}
                     target="_blank"
                     rel="noopener noreferrer"
