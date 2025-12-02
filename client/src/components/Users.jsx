@@ -1,9 +1,37 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux"; // ADDED useDispatch
+import { Trash2 } from "lucide-react"; // ADDED Trash2 icon
+import { toast } from "react-toastify"; // ADDED toast
+import { deleteUser, fetchAllUsers, resetUserSlice } from "../store/slices/userSlice"; // IMPORTED deleteUser, fetchAllUsers, resetUserSlice
 import Header from "../layout/Header";
 
 const Users = () => {
-  const { users } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { users, error, message } = useSelector((state) => state.user);
+
+  // 🚀 Fetch users on mount and handle state/messages
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(resetUserSlice());
+    }
+    if (message) {
+      toast.success(message);
+      dispatch(resetUserSlice());
+    }
+  }, [dispatch, error, message]);
+
+  // 🚀 NEW FUNCTION: Handles the delete button click
+  const handleDeleteUser = (userId, userName) => {
+      // Basic confirmation before deleting
+      if (window.confirm(`Are you sure you want to remove user: ${userName}? This action is irreversible.`)) {
+          dispatch(deleteUser(userId));
+      }
+  };
 
   const formatDate = (timeStamp) => {
     const date = new Date(timeStamp);
@@ -39,8 +67,8 @@ const Users = () => {
                   <th className="px-4 py-2  text-left ">Name</th>
                   <th className="px-4 py-2  text-left ">Email</th>
                   <th className="px-4 py-2  text-left ">Role</th>
-                  {/* REMOVED: No. of Books Borrowed Header */}
                   <th className="px-4 py-2  text-left ">Created At</th>
+                  <th className="px-4 py-2  text-center ">Actions</th> {/* 🚀 NEW HEADER */}
                 </tr>
               </thead>
 
@@ -56,8 +84,15 @@ const Users = () => {
                       <td className="px-4 py-2">{user.name}</td>
                       <td className="px-4 py-2">{user.email}</td>
                       <td className="px-4 py-2">{user.role}</td>
-                      {/* REMOVED: No. of Books Borrowed Data */}
                       <td className="px-4 py-2">{formatDate(user.createdAt)}</td>
+                      {/* 🚀 NEW ACTIONS CELL */}
+                      <td className="px-4 py-2 text-center">
+                        <Trash2
+                            className="cursor-pointer text-red-600 hover:text-red-800 mx-auto"
+                            onClick={() => handleDeleteUser(user._id, user.name)}
+                            title={`Remove User: ${user.name}`}
+                        />
+                      </td>
                     </tr>
                   ))}
               </tbody>

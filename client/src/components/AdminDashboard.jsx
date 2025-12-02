@@ -64,8 +64,8 @@ const AdminDashboard = () => {
   );
   // Removed borrow slice selectors and loading state
 
-  // Calculate stats (Simplified to only count users and books)
-  const totalUsers = users ? users.length : 0;
+  // 🚀 UPDATED: Calculate stats to only count users with role "User"
+  const totalUsers = users ? users.filter(u => u.role === "User").length : 0;
   const totalBooks = books ? books.length : 0;
   // Removed: availableBooks and unavailableBooks logic
 
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   // Pie Chart Data (Kept simple to show book count vs. user count if desired, or simplified)
   // Let's simplify the chart to show Book Count vs. User Count
   const chartData = {
-    labels: ["Total Books", "Total Users"],
+    labels: ["Total Books", "Registered Users"], // 🚀 Updated label
     datasets: [
       {
         data: [totalBooks, totalUsers],
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
       },
       title: {
         display: true,
-        text: "Library vs. User Count",
+        text: "Library vs. Registered User Count", // 🚀 Updated chart title
       },
     },
   };
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
         {/* Stat Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatCard
-            title="Total Users"
+            title="Registered Users" // 🚀 Updated card title
             value={totalUsers}
             icon={usersIcon}
             loading={userLoading}

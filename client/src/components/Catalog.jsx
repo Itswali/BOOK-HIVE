@@ -5,7 +5,10 @@ import { BookA, Heart, Download } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { fetchAllBooks, resetBookSlice } from "../store/slices/bookSlice";
-import { toggleReadBookPopup } from "../store/slices/popUpSlice";
+import {
+  toggleReadBookPopup,
+  toggleDownloadBookPopup, // <-- KEEP
+} from "../store/slices/popUpSlice";
 import {
   addToFavorites,
   removeFromFavorites,
@@ -14,13 +17,14 @@ import {
 } from "../store/slices/favoriteSlice";
 import Header from "../layout/Header";
 import ReadBookPopup from "../popups/ReadBookPopup";
+import DownloadBookPopup from "../popups/DownloadBookPopup"; // <-- IMPORT NEW POPUP
 
 const Catalog = () => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
-  const [readBook, setReadBook] = useState(null);
+  const [readBook, setReadBook] = useState(null); // Used for both Read and Download popups
 
-  const { readBookPopup } = useSelector((state) => state.popup);
+  const { readBookPopup, downloadBookPopup } = useSelector((state) => state.popup); // <-- DESTRUCTURE NEW STATE
   const { books, loading: bookLoading, error: bookError, message: bookMessage } = useSelector((state) => state.book);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const {
@@ -62,9 +66,16 @@ const Catalog = () => {
   }, [dispatch, bookError, bookMessage, favoriteError, favoriteMessage]); // Removed borrowError, borrowMessage
 
 
+  // Handler for Read/View Book Info
   const handleViewBook = (book) => {
     setReadBook(book);
     dispatch(toggleReadBookPopup());
+  };
+
+  // Handler for Download Book
+  const handleDownloadBook = (book) => { // <-- NEW HANDLER
+    setReadBook(book);
+    dispatch(toggleDownloadBookPopup());
   };
 
 
@@ -143,11 +154,17 @@ const Catalog = () => {
 
 
                         {/* View/Read Button */}
-                        <Download
+                        <BookA
                             onClick={() => handleViewBook(book)}
                             className="cursor-pointer text-blue-600 hover:text-blue-800"
                             title="View Book Info / Read Online"
                         />
+                        <Download
+                            onClick={() => handleDownloadBook(book)} // <-- USE NEW HANDLER
+                            className="cursor-pointer text-green-600 hover:text-green-800" // Changed color for distinction
+                            title="Download Book"
+                        />
+
 
 
 
@@ -175,7 +192,17 @@ const Catalog = () => {
           )}
         </div>
       </main>
+
+      {/* Read Book Popup */}
       {readBookPopup && readBook && <ReadBookPopup book={readBook} />}
+
+      {/* Download Book Popup - NEW */}
+      {downloadBookPopup && readBook && (
+        <DownloadBookPopup
+          book={readBook}
+          onClose={() => dispatch(toggleDownloadBookPopup())}
+        />
+      )}
     </>
   );
 };

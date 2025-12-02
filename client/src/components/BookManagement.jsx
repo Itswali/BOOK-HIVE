@@ -141,12 +141,16 @@ const BookManagement = () => {
                     </td>
                     {/* --- ACTIONS COLUMN --- */}
                     <td className="px-4 py-2 flex space-x-4 justify-center">
-                      {/* View/Read Button */}
-                      {/* <BookA
-                        onClick={() => handleViewBook(book)}
-                        className="cursor-pointer text-blue-600"
-                        title="View Book Info / Read Online"
-                      /> */}
+
+                      {/* Common: View Book Button (Added for Admin and User) */}
+                      {isAuthenticated && (
+                          <BookA
+                            className="cursor-pointer text-gray-600 hover:text-blue-600"
+                            onClick={() => handleViewBook(book)}
+                            title="View Book Details"
+                          />
+                      )}
+
 
                       {/* Admin: Delete Book Button */}
                       {isAuthenticated && user?.role === "Admin" && (
