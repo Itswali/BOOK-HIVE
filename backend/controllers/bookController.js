@@ -98,17 +98,25 @@ export const deleteBook = catchAsyncErrors(async(req, res, next) => {
     return next(new ErrorHandler("Book not found.", 404));
   }
 
-  // Delete the PDF file from Cloudinary (Highly recommended)
+  // 1. Delete the PDF file from Cloudinary (Already present, good)
   if (book.bookFile && book.bookFile.public_id) {
     await cloudinary.uploader.destroy(book.bookFile.public_id, {
       resource_type: "raw",
     });
   }
 
+  // 2. *** CRITICAL FIX: Remove the deleted book ID from ALL users' favoriteBooks array ***
+  // Use updateMany to efficiently remove the book ID from all User documents
+  await User.updateMany(
+    {}, // Query all users
+    { $pull: { favoriteBooks: id } } // Remove the book ID from their array
+  );
+
+  // 3. Delete the book document
   await book.deleteOne();
 
   res.status(200).json({
     sucess: true,
-    message: "Book deleted successfully.",
+    message: "Book deleted successfully, and all user favorites updated.", // Updated message
   });
 });
