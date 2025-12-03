@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -7,28 +7,45 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import OnlineReader from "./pages/OnlineReader";
 import { ToastContainer } from "react-toastify";
-// NOTE: Removed 'import "react-toastify/dist/ReactToastify.css";' to fix compilation error.
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
 import { fetchAllUsers } from "./store/slices/userSlice";
 import { fetchAllBooks } from "./store/slices/bookSlice";
 
 const App = () => {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  // Update data fetching logic
+  // CRITICAL FIX: Track if the initial auth check is complete
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+
   useEffect(() => {
-    // 1. Fetch user authentication status
-    dispatch(getUser());
-    // 2. Fetch all books for the catalog
+    dispatch(getUser()).finally(() => {
+      // Ensure this flag is set regardless of success or failure
+      setIsAuthInitialized(true);
+    });
+
+    // 2. Fetch all books for the catalog (can run concurrently)
     dispatch(fetchAllBooks());
 
-    // 3. Fetch all user data only if the user is an authenticated Admin
-    if( isAuthenticated && user?.role === "Admin"){
+  }, [dispatch]); // Run only once on mount
+
+  // 3. Fetch all user data only if the user role changes or becomes Admin
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "Admin"){
       dispatch(fetchAllUsers());
     }
   }, [isAuthenticated, dispatch, user?.role]);
+
+  if (!isAuthInitialized || loading) {
+    return (
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+            <div className="text-2xl font-semibold text-indigo-600 animate-pulse">
+                Initializing BookHive...
+            </div>
+        </div>
+    );
+  }
 
   return (
     <Router>
@@ -38,7 +55,6 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
-        {/* Route for reading books online */}
         <Route path="/read-book/:bookId" element={<OnlineReader />} />
       </Routes>
       <ToastContainer theme="dark" />

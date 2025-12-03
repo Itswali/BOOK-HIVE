@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BookA } from "lucide-react";
+import { BookA, Download } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleReadBookPopup } from "../store/slices/popUpSlice";
@@ -41,6 +41,32 @@ const MyFavorites = () => {
     dispatch(removeFromFavorites(bookId));
   };
 
+  // 📥 NEW FUNCTION: Handles the book download
+  const handleDownloadBook = (book) => {
+    if (book?.bookFile?.url) {
+        // Create an invisible anchor tag
+        const link = document.createElement('a');
+        link.href = book.bookFile.url;
+
+        // Use the title of the book for the downloaded file name
+        // The URL is already public (Cloudinary), so no need for complex fetch/blob logic
+        link.setAttribute('download', `${book.title}_by_${book.author}.pdf`);
+
+        // Append to the document body
+        document.body.appendChild(link);
+
+        // Programmatically click the link to trigger the download
+        link.click();
+
+        // Clean up: remove the link
+        document.body.removeChild(link);
+
+        toast.info(`Download started for "${book.title}"`);
+    } else {
+        toast.error("Error: Book file URL not found.");
+    }
+  };
+
   return (
     <>
       <main className="relative flex-1 p-6 pt-28">
@@ -78,6 +104,12 @@ const MyFavorites = () => {
                         onClick={() => openReadPopup(book)}
                         title="View Info"
                       />
+                      <Download
+                            // ❗ UPDATED: Call the new handleDownloadBook function
+                            onClick={() => handleDownloadBook(book)}
+                            className="cursor-pointer text-blue-600 hover:text-blue-800"
+                            title="Download Book"
+                        />
 
                       <button onClick={() => handleRemoveFavorite(book._id)} title="Remove from Favorites">
                         <FaHeart className="text-red-600 w-5 h-5 hover:text-red-400" />
@@ -92,7 +124,7 @@ const MyFavorites = () => {
           <h3 className="text-3xl mt-5 font-medium"> No favorite books found!</h3>
         )}
       </main>
-      {readBookPopup && <ReadBookPopup book={readBook} />}\
+      {readBookPopup && <ReadBookPopup book={readBook} />}
     </>
   );
 };

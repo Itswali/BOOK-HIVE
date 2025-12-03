@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-// REMOVED: import { resetBorrowSlice } from "../store/slices/borrowSlice";
+import { fetchMyFavorites } from "../store/slices/favoriteSlice"; // 🚀 IMPORT fetchMyFavorites
 
 // ADDED: Missing Header Import
 import Header from "../layout/Header";
@@ -39,14 +39,25 @@ const UserDashboard = ({ setSelectedComponent }) => {
 
   // Redux State Selectors
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  // 🚀 NEW: Select the favorite list from the favorite slice
+  const { myFavorites, loading: favoriteLoading } = useSelector((state) => state.favorite);
 
   // --- Calculations for Remaining Metrics ---
-  const totalFavoriteBooks =
-    user && user.favoriteBooks ? user.favoriteBooks.length : 0;
+  // 🚀 UPDATED: Use the freshly fetched and populated myFavorites list for the count
+  const totalFavoriteBooks = myFavorites ? myFavorites.length : 0;
+
+  // 🚀 NEW useEffect: Fetch the latest list of favorites on mount
+  useEffect(() => {
+    // This fetch hits the endpoint that populates favoriteBooks and ensures
+    // the list is clean of any deleted book IDs (as the backend handles cleanup).
+    if (isAuthenticated) {
+        dispatch(fetchMyFavorites());
+    }
+  }, [dispatch, isAuthenticated]);
 
   // --- Error Handling ---
   useEffect(() => {
-    // Error handling logic
+    // Error handling logic (Placeholder for now)
   }, [dispatch]);
 
   // --- Rendering ---
@@ -76,8 +87,9 @@ const UserDashboard = ({ setSelectedComponent }) => {
             title="Favorite Books"
             value={totalFavoriteBooks}
             icon={heartIcon}
+            // 🚀 Use favoriteLoading state for the card
+            loading={!isAuthenticated || favoriteLoading}
             bgColor="#DC2626" // Red
-            loading={!isAuthenticated}
           />
         </div>
 

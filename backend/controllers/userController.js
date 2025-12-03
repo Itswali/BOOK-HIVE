@@ -62,3 +62,35 @@ export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
 
  sendToken(admin, 201, "New Admin registered successfully.", res);
 });
+
+export const deleteUser = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.params; // ID of the user to delete
+
+    const user = await User.findById(id);
+
+    if (!user) {
+        return next(new ErrorHandler("User not found.", 404));
+    }
+
+    // Prevent Admin from deleting themselves or another Admin (optional security)
+    if (user.role === "Admin") {
+        return next(new ErrorHandler("Cannot delete an Admin account through this route.", 403));
+    }
+
+    // Optional: Delete user's avatar image from Cloudinary
+    if (user.avatar?.public_id) {
+        // Since we don't know the resource type, let's assume it's an 'image' for simplicity.
+        // You might need to adjust this based on your upload settings if not 'image'.
+        await cloudinary.uploader.destroy(user.avatar.public_id);
+    }
+
+    // Deleting the User document:
+    // Since 'favoriteBooks' are stored as an array of IDs inside the User model,
+    // deleting the User document automatically deletes all their favorite book records.
+    await user.deleteOne();
+
+    res.status(200).json({
+        success: true,
+        message: `User (${user.name}) deleted successfully.`,
+    });
+});

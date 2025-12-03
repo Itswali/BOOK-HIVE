@@ -7,14 +7,14 @@ import { v2 as cloudinary } from "cloudinary";
 import ErrorHandler from "../middlewares/errorMiddlewares.js";
 
 
-// Admin: Add a new book (Removed price and quantity check)
+// Admin: Add a new book (Updated to include genre)
 export const addBook = catchAsyncErrors(async(req, res, next) => {
-  // Removed price, quantity from destructuring
-  const { title, author, description } = req.body;
+  // ADDED 'genre' to destructuring
+  const { title, author, description, genre } = req.body;
 
-  // Updated check
-  if(!title || !author || !description) {
-    return next(new ErrorHandler("Please fill all fields: title, author, and description.", 400));
+  // UPDATED check to include 'genre'
+  if(!title || !author || !description || !genre) {
+    return next(new ErrorHandler("Please fill all fields: title, author, description, and genre.", 400));
   }
 
   // --- LOGIC FOR PDF FILE (Remains the same) ---
@@ -41,11 +41,12 @@ export const addBook = catchAsyncErrors(async(req, res, next) => {
   }
   // --- END PDF FILE LOGIC ---
 
-  // Create the book (Removed price, quantity)
+  // Create the book (ADDED 'genre')
   const book = await Book.create({
     title,
     author,
     description,
+    genre, // NEW FIELD ADDED
     bookFile: {
       public_id: cloudinaryResponse.public_id,
       url: cloudinaryResponse.secure_url,
@@ -98,17 +99,23 @@ export const deleteBook = catchAsyncErrors(async(req, res, next) => {
     return next(new ErrorHandler("Book not found.", 404));
   }
 
-  // Delete the PDF file from Cloudinary (Highly recommended)
+  // 1. Delete the PDF file from Cloudinary (Already present, good)
   if (book.bookFile && book.bookFile.public_id) {
     await cloudinary.uploader.destroy(book.bookFile.public_id, {
       resource_type: "raw",
     });
   }
 
+  await User.updateMany(
+    {}, // Query all users
+    { $pull: { favoriteBooks: id } } // Remove the book ID from their array
+  );
+
+  // 3. Delete the book document
   await book.deleteOne();
 
   res.status(200).json({
     sucess: true,
-    message: "Book deleted successfully.",
+    message: "Book deleted successfully, and all user favorites updated.", // Updated message
   });
 });

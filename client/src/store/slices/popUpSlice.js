@@ -7,8 +7,7 @@ const popupSlice = createSlice({
     settingPopup: false,
     addBookPopup: false,
     readBookPopup: false,
-    // REMOVED: recordBookPopup: false,
-    // REMOVED: returnBookPopup: false,
+    downloadBookPopup: false, // <-- ADDED: State for Download Popup
     addNewAdminPopup: false,
   },
   reducers: {
@@ -21,8 +20,10 @@ const popupSlice = createSlice({
     toggleReadBookPopup(state) {
       state.readBookPopup = !state.readBookPopup;
     },
-    // REMOVED: toggleRecordBookPopup
-    // REMOVED: toggleReturnBookPopup
+    // ADDED: Reducer for Download Popup
+    toggleDownloadBookPopup(state) {
+      state.downloadBookPopup = !state.downloadBookPopup;
+    },
     toggleAddNewAdminPopup(state) {
       state.addNewAdminPopup = !state.addNewAdminPopup;
     },
@@ -30,8 +31,7 @@ const popupSlice = createSlice({
       state.addBookPopup = false;
         state.addNewAdminPopup = false;
         state.readBookPopup = false;
-        // REMOVED: state.recordBookPopup = false;
-        // REMOVED: state.returnBookPopup = false;
+        state.downloadBookPopup = false; // <-- ADDED: Close Download Popup
         state.settingPopup = false;
     },
 
@@ -39,6 +39,13 @@ const popupSlice = createSlice({
 });
 
 
-export const { closeAllPopup, toggleAddBookPopup, toggleAddNewAdminPopup, toggleReadBookPopup, toggleSettingPopup } = popupSlice.actions; // Export list updated
+export const {
+    closeAllPopup,
+    toggleAddBookPopup,
+    toggleAddNewAdminPopup,
+    toggleReadBookPopup,
+    toggleDownloadBookPopup, // <-- ADDED: Export the new action
+    toggleSettingPopup
+} = popupSlice.actions;
 
 export default popupSlice.reducer;

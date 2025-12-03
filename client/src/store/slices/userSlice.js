@@ -8,14 +8,13 @@ const userSlice = createSlice({
   initialState: {
     users: [],
     loading: false,
-    // ADDED: State to track errors and messages for cleanup
     error: null,
     message: null,
   },
   reducers: {
     fetchAllUsersRequest(state){
       state.loading = true;
-      state.error = null; // Clear error on new request
+      state.error = null;
     },
     fetchAllUsersSuccess(state, action){
       state.loading = false;
@@ -23,20 +22,34 @@ const userSlice = createSlice({
     },
     fetchAllUsersFailed(state, action){
       state.loading = false;
-      state.error = action.payload; // Capture error message
+      state.error = action.payload;
     },
     addNewAdminRequest(state){
       state.loading= true;
-      state.error = null; // Clear error on new request
+      state.error = null;
     },
     addNewAdminSuccess(state){
       state.loading = false;
     },
-    addNewAdminFailed(state, action){ // Action added to receive error message
+    addNewAdminFailed(state, action){
       state.loading = false;
-      state.error = action.payload; // Capture error message
+      state.error = action.payload;
     },
-    // ADDED: The missing reset reducer
+    // 🚀 NEW REDUCERS FOR USER DELETION
+    deleteUserRequest(state) {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+    },
+    deleteUserSuccess(state, action) {
+        state.loading = false;
+        state.message = action.payload;
+    },
+    deleteUserFailed(state, action) {
+        state.loading = false;
+        state.error = action.payload;
+    },
+    // END NEW REDUCERS
     resetUserSlice(state) {
         state.error = null;
         state.message = null;
@@ -46,15 +59,13 @@ const userSlice = createSlice({
 
 });
 
-// EXPORTED: The missing action creator
 export const { resetUserSlice } = userSlice.actions;
 
 export const fetchAllUsers = () => async(dispatch) => {
   dispatch(userSlice.actions.fetchAllUsersRequest());
-  await axios.get("https://book-hive-mt7z.onrender.com/api/v1/user/all", {withCredentials: true}).then(res => {
+  await axios.get("http://localhost:4000/api/v1/user/all", {withCredentials: true}).then(res => {
     dispatch(userSlice.actions.fetchAllUsersSuccess(res.data.users))
   }).catch(err =>{
-    // Passed error message to failed action
     dispatch(userSlice.actions.fetchAllUsersFailed(err.response.data.message));
   });
 };
@@ -64,7 +75,7 @@ export const addNewAdmin = (data) => async (dispatch) => {
   dispatch(userSlice.actions.addNewAdminRequest());
   try {
     const res = await axios.post(
-      "https://book-hive-mt7z.onrender.com/api/v1/user/add/new-admin",
+      "http://localhost:4000/api/v1/user/add/new-admin",
       data,
       {
         withCredentials: true,
@@ -76,11 +87,31 @@ export const addNewAdmin = (data) => async (dispatch) => {
     dispatch(toggleAddNewAdminPopup());
     dispatch(fetchAllUsers());
   } catch (err) {
-    // Passed error message to failed action
     const errorMessage = err.response?.data?.message || "Something went wrong";
     dispatch(userSlice.actions.addNewAdminFailed(errorMessage));
     toast.error(errorMessage);
   }
+};
+
+// 🚀 NEW THUNK: Admin Delete User
+export const deleteUser = (userId) => async (dispatch) => {
+    dispatch(userSlice.actions.deleteUserRequest());
+    try {
+        const res = await axios.delete(
+            `http://localhost:4000/api/v1/user/admin/delete/${userId}`,
+            { withCredentials: true }
+        );
+
+        const successMessage = res.data.message || "User deleted successfully!";
+
+        dispatch(userSlice.actions.deleteUserSuccess(successMessage));
+        // Refresh the list of users after successful deletion
+        dispatch(fetchAllUsers());
+    } catch (err) {
+        const errorMessage = err.response?.data?.message || "Failed to delete user.";
+        toast.error(errorMessage);
+        dispatch(userSlice.actions.deleteUserFailed(errorMessage));
+    }
 };
 
 

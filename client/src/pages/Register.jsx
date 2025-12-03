@@ -28,7 +28,7 @@ useEffect(() => {
   if (message) {
     toast.success(message);
     dispatch(resetAuthSlice());
-    navigateTo(`/otp-verification/${email}`);
+    navigateTo(`/`);
   }
   if (error) {
     toast.error(error);
