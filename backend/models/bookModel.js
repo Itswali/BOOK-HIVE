@@ -18,6 +18,12 @@
     type: String,
     required: true
   },
+  // ADDED: Genre field
+  genre: {
+    type: String,
+    required: true, // Making genre mandatory as per controller logic
+    trim: true,
+  },
   // Removed: price
   // Removed: quantity
   // Removed: availability

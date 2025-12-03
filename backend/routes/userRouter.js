@@ -8,7 +8,6 @@ router.get("/all", isAuthenticated, isAuthorized("Admin"), getAllUsers);
 
 router.post("/add/new-admin", isAuthenticated, isAuthorized("Admin"), registerNewAdmin);
 
-// 🚀 NEW ROUTE: Admin Delete User
 // The ID in the path parameter will be the ID of the user to be deleted.
 router.delete("/admin/delete/:id", isAuthenticated, isAuthorized("Admin"), deleteUser);
 
