@@ -1,29 +1,31 @@
 # BOOKHIVE Digital Library System
 
-**BOOKHIVE** is a robust, full-stack digital library platform designed to allow users to securely browse, read, and manage a catalog of digital books. Built on the **MERN Stack**, it features comprehensive Role-Based Access Control (RBAC) to differentiate between regular users and system administrators.
+**BOOKHIVE** is a robust, full-stack digital library platform designed to allow users to securely browse, read, and manage a catalog of digital books. Built on the **MERN Stack** (MongoDB, Express, React, Node.js), it features comprehensive **Role-Based Access Control (RBAC)** to differentiate between regular users and system administrators.
 
 ## ✨ Key Features
 
 ### Core Functionality
 * **Full Digital Catalog:** Users can browse and search a complete catalog of books.
-* **Online Reader:** Integrated PDF viewing directly within the application (`OnlineReader.jsx`).
+* **Online Reader:** Integrated PDF viewing directly within the application (client-side component: `OnlineReader.jsx`).
 * **Download Books:** Secure download functionality for digital files.
 * **User Favorites:** Users can manage a personal list of favorite books (`MyFavorites.jsx`).
 
 ### Technical & Security Features
-* **MERN Stack:** Utilizes MongoDB, Express, React, and Node.js for a seamless full-stack JavaScript environment.
-* **Role-Based Access Control (RBAC):** Restricts access to certain resources based on the user's role (`Admin` or `User`).
+* **MERN Stack:** Utilizes **MongoDB**, **Express**, **React**, and **Node.js** for a seamless full-stack JavaScript environment.
+* **Role-Based Access Control (RBAC):** Restricts access to resources based on the user's role (`Admin` or `User`).
 * **JWT Authentication:** Secure user sessions handled via JSON Web Tokens stored in HTTP-only cookies.
 * **Bcrypt Hashing:** Ensures secure storage of user passwords.
 * **Cloudinary Integration:** External cloud service used for reliable and scalable storage of book PDF files and user avatars.
 * **Redux Toolkit:** Centralized state management for predictable data flow across the React frontend.
-* **Custom Error Handling:** Middleware to catch async errors and handle specific MongoDB/JWT errors gracefully (`errorMiddlewares.js`, `catchAsyncErrors.js`).
+* **Custom Error Handling:** Middleware to gracefully handle API errors, including MongoDB and JWT specific errors.
 
 ### Admin Management
 * **Admin Dashboard:** Overview of system metrics (Total Books, Total Users).
 * **Book Management:** Dedicated panel to add new books (upload PDF and metadata) and delete existing ones.
 * **User Management:** Ability to view all users and delete non-Admin accounts.
 * **Admin Registration:** Secure route for an existing Admin to register new administrators.
+
+---
 
 ## 💻 Tech Stack
 
@@ -35,9 +37,11 @@
 | **Storage** | Cloudinary | Cloud-based file hosting for PDFs and images. |
 | **Security** | JWT, bcrypt | Stateless authentication and password hashing. |
 
+---
+
 ## 🚀 Getting Started
 
-Follow these steps to set up the project locally.
+The project is split into two main directories: `backend` for the server and `client` for the frontend. Follow these steps to set up the project locally.
 
 ### Prerequisites
 
@@ -50,19 +54,26 @@ Follow these steps to set up the project locally.
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <repository_url>
-    cd <project-folder>
+    git clone [https://github.com/Itswali/BOOK-HIVE.git](https://github.com/Itswali/BOOK-HIVE.git)
+    cd BOOK-HIVE # Navigate to the root directory
     ```
 
-2.  **Install Dependencies:**
-    Assuming a unified project structure:
+2.  **Install Backend Dependencies:**
     ```bash
+    cd backend
     npm install
-    # If client is separate, navigate to client folder and run npm install there too.
+    cd ..
     ```
 
-3.  **Setup Environment Variables:**
-    Create a file named `.env` in the root directory and add the following configuration. **Replace placeholder values with your actual keys.**
+3.  **Install Frontend Dependencies:**
+    ```bash
+    cd client
+    npm install
+    cd ..
+    ```
+
+4.  **Setup Environment Variables:**
+    Create a file named `.env` in the **`backend`** folder (e.g., `BOOK-HIVE/backend/.env`) and add the following configuration. **Replace placeholder values with your actual keys.**
 
     ```env
     # Server Configuration
@@ -83,26 +94,31 @@ Follow these steps to set up the project locally.
     CLOUDINARY_CLIENT_SECRET=your_api_secret
     ```
 
+---
+
 ### Running the Application
 
-1.  **Start the Server:**
+You must start the backend and frontend separately.
+
+1.  **Start the Backend Server:**
     ```bash
-    npm run dev  # Or your specific server start command
+    cd backend
+    npm run dev  # Starts the Node/Express server (API runs on http://localhost:4000)
     ```
 
-2.  **Start the Client:**
-    If the frontend runs separately (e.g., in a `client` folder):
+2.  **Start the Frontend Client:**
     ```bash
-    # cd client
-    # npm run dev
+    cd client
+    npm run dev  # Starts the React application (Client runs on http://localhost:5173)
     ```
-    The server will run on the specified `PORT` (e.g., `http://localhost:4000`).
+
+---
 
 ## 🔑 User Roles and Access
 
-The system enforces strict access control through the `isAuthorized` middleware.
+The system enforces strict access control through the `isAuthorized` middleware, granting distinct permissions to each role.
 
 | Role | Accessible Components | Key Permissions |
 | :--- | :--- | :--- |
-| **User** | User Dashboard, Catalog, My Favorites, Online Reader, Update Credentials. | Register, Login, View Books, Add/Remove Favorites, Download. |
+| **User** | User Dashboard, Catalog, My Favorites, Online Reader, Update Credentials. | Register, Login, View Books, **Add/Remove Favorites, Download.** |
 | **Admin** | Admin Dashboard, Users Management, Book Management, Update Credentials. | All User Permissions, **Add/Delete Books, View/Delete Users, Register New Admins.** |
