@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// Removed: PiKeyReturnBold, FaSquareCheck, Hand icons
 import { FaHeart } from "react-icons/fa";
 import { BookA, Heart, Download } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,7 +6,7 @@ import { toast } from "react-toastify";
 import { fetchAllBooks, resetBookSlice } from "../store/slices/bookSlice";
 import {
   toggleReadBookPopup,
-  toggleDownloadBookPopup, // <-- KEEP
+  toggleDownloadBookPopup,
 } from "../store/slices/popUpSlice";
 import {
   addToFavorites,
@@ -17,14 +16,14 @@ import {
 } from "../store/slices/favoriteSlice";
 import Header from "../layout/Header";
 import ReadBookPopup from "../popups/ReadBookPopup";
-import DownloadBookPopup from "../popups/DownloadBookPopup"; // <-- IMPORT NEW POPUP
+import DownloadBookPopup from "../popups/DownloadBookPopup";
 
 const Catalog = () => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
-  const [readBook, setReadBook] = useState(null); // Used for both Read and Download popups
+  const [readBook, setReadBook] = useState(null);
 
-  const { readBookPopup, downloadBookPopup } = useSelector((state) => state.popup); // <-- DESTRUCTURE NEW STATE
+  const { readBookPopup, downloadBookPopup } = useSelector((state) => state.popup);
   const { books, loading: bookLoading, error: bookError, message: bookMessage } = useSelector((state) => state.book);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const {
@@ -63,7 +62,7 @@ const Catalog = () => {
       toast.success(favoriteMessage);
       dispatch(resetFavoriteSlice());
     }
-  }, [dispatch, bookError, bookMessage, favoriteError, favoriteMessage]); // Removed borrowError, borrowMessage
+  }, [dispatch, bookError, bookMessage, favoriteError, favoriteMessage]);
 
 
   // Handler for Read/View Book Info
@@ -73,7 +72,7 @@ const Catalog = () => {
   };
 
   // Handler for Download Book
-  const handleDownloadBook = (book) => { // <-- NEW HANDLER
+  const handleDownloadBook = (book) => {
     setReadBook(book);
     dispatch(toggleDownloadBookPopup());
   };
@@ -92,9 +91,11 @@ const Catalog = () => {
   };
 
 
+  // UPDATED: Filter logic to include searching by genre
   const filteredBooks = books.filter((book) =>
     book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+    book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.genre.toLowerCase().includes(searchTerm.toLowerCase()) // New search criterion
   );
 
   return (
@@ -107,7 +108,8 @@ const Catalog = () => {
         <div className="flex justify-end mb-6">
           <input
             type="text"
-            placeholder="Search by Title or Author..."
+            // UPDATED placeholder text
+            placeholder="Search by Title, Author, or Genre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-1/3 p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -131,6 +133,10 @@ const Catalog = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Author
                     </th>
+                    {/* NEW: Genre Header */}
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Genre
+                    </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Description
                     </th>
@@ -146,6 +152,8 @@ const Catalog = () => {
                       <td className="px-4 py-2">{index + 1}</td>
                       <td className="px-4 py-2 font-medium">{book.title}</td>
                       <td className="px-4 py-2">{book.author}</td>
+                      {/* NEW: Genre Data */}
+                      <td className="px-4 py-2">{book.genre}</td>
                       <td className="px-4 py-2 max-w-xs truncate">
                         {book.description}
                       </td>
@@ -160,8 +168,8 @@ const Catalog = () => {
                             title="View Book Info / Read Online"
                         />
                         <Download
-                            onClick={() => handleDownloadBook(book)} // <-- USE NEW HANDLER
-                            className="cursor-pointer text-green-600 hover:text-green-800" // Changed color for distinction
+                            onClick={() => handleDownloadBook(book)}
+                            className="cursor-pointer text-green-600 hover:text-green-800"
                             title="Download Book"
                         />
 
@@ -175,9 +183,9 @@ const Catalog = () => {
                             title={isFavorite(book._id) ? "Remove from Favorites" : "Add to Favorites"}
                           >
                             {isFavorite(book._id) ? (
-                              <FaHeart className="text-red-600 w-5 h-5" /> // Filled heart for favorite
+                              <FaHeart className="text-red-600 w-5 h-5" />
                             ) : (
-                              <Heart className="text-gray-400 w-5 h-5 hover:text-red-600" /> // Outline heart
+                              <Heart className="text-gray-400 w-5 h-5 hover:text-red-600" />
                             )}
                           </button>
                         )}

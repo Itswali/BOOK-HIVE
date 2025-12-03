@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleBook } from "../store/slices/bookSlice";
 import { toast } from "react-toastify";
+// NEW: Import the Download icon
+import { Download } from "lucide-react";
 
 const OnlineReader = () => {
   const { bookId } = useParams();
@@ -13,7 +15,6 @@ const OnlineReader = () => {
   const { loading, error } = useSelector((state) => state.book);
 
   // --- Redux Fetch Logic ---
-  // (Your useEffect block is correctly using async/await and is fine)
   useEffect(() => {
     const fetchBook = async () => {
         if (!bookId) {
@@ -82,12 +83,33 @@ const OnlineReader = () => {
         <h1 className="text-xl font-bold truncate max-w-[70%]">
           Reading: {bookData?.title || 'Unknown Book'}
         </h1>
-        <button
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-indigo-700 rounded-md hover:bg-indigo-800 transition font-semibold"
-        >
-          Close Reader
-        </button>
+
+        {/* NEW: Action Buttons Container */}
+        <div className="flex items-center space-x-3">
+            {/* 🚀 NEW DOWNLOAD BUTTON */}
+            {bookData?.bookFile?.url && (
+                <a
+                    href={bookData.bookFile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    // Added download attribute for better control, though headers control final behavior
+                    download={`${bookData?.title || 'book'}.pdf`}
+                    title="Download PDF File"
+                    className="p-2 bg-indigo-700 rounded-md hover:bg-indigo-800 transition"
+                >
+                    <Download size={20} />
+                </a>
+            )}
+
+            {/* Existing Close Reader Button */}
+            <button
+              onClick={() => navigate('/')}
+              className="px-4 py-2 bg-indigo-700 rounded-md hover:bg-indigo-800 transition font-semibold"
+            >
+              Close Reader
+            </button>
+        </div>
+
       </header>
 
       <main className="flex-1 overflow-hidden bg-gray-100 p-0 flex flex-col items-center">
