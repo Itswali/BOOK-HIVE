@@ -1,6 +1,8 @@
-# BOOKHIVE Digital Library System
+# BOOKHIVE Digital Library System 📚
 
 **BOOKHIVE** is a robust, full-stack digital library platform designed to allow users to securely browse, read, and manage a catalog of digital books. Built on the **MERN Stack** (MongoDB, Express, React, Node.js), it features comprehensive **Role-Based Access Control (RBAC)** to differentiate between regular users and system administrators.
+
+---
 
 ## ✨ Key Features
 
@@ -11,7 +13,10 @@
 * **User Favorites:** Users can manage a personal list of favorite books (`MyFavorites.jsx`).
 
 ### Technical & Security Features
-* **MERN Stack:** Utilizes **MongoDB**, **Express**, **React**, and **Node.js** for a seamless full-stack JavaScript environment.
+* **MERN Stack:** Utilizes **MongoDB**, **Express**, **React**, and **Node.js** for a seamless full-stack JavaScript environment. 
+
+[Image of MERN Stack Diagram]
+
 * **Role-Based Access Control (RBAC):** Restricts access to resources based on the user's role (`Admin` or `User`).
 * **JWT Authentication:** Secure user sessions handled via JSON Web Tokens stored in HTTP-only cookies.
 * **Bcrypt Hashing:** Ensures secure storage of user passwords.
@@ -122,3 +127,11 @@ The system enforces strict access control through the `isAuthorized` middleware,
 | :--- | :--- | :--- |
 | **User** | User Dashboard, Catalog, My Favorites, Online Reader, Update Credentials. | Register, Login, View Books, **Add/Remove Favorites, Download.** |
 | **Admin** | Admin Dashboard, Users Management, Book Management, Update Credentials. | All User Permissions, **Add/Delete Books, View/Delete Users, Register New Admins.** |
+
+---
+
+## 🌐 Live Demo
+
+You can explore a live version of the BOOKHIVE Digital Library System here:
+
+**[https://book-hives.netlify.app/](https://book-hives.netlify.app/)**
